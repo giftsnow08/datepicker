@@ -1,0 +1,277 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+/* =====================
+   Variables
+   ===================== */
+:root {
+  --bg:           #f1f5f9;
+  --white:        #ffffff;
+  --border:       #d1d5db;
+  --text:         #111827;
+  --text-muted:   #9ca3af;
+  --hover-bg:     #f3f4f6;
+  --primary:      #2563eb;
+  --primary-dark: #1d4ed8;
+  --today-bg:     #dbeafe;
+  --today-text:   #1d4ed8;
+  --shadow:       0 4px 24px rgba(0, 0, 0, 0.11), 0 1px 4px rgba(0, 0, 0, 0.07);
+  --radius:       8px;
+  --font:         'Inter', system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:         #0f172a;
+    --white:      #1e293b;
+    --border:     #334155;
+    --text:       #f1f5f9;
+    --text-muted: #64748b;
+    --hover-bg:   #334155;
+    --today-bg:   #1e3a5f;
+    --today-text: #93c5fd;
+  }
+}
+
+/* =====================
+   Reset
+   ===================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* =====================
+   Page
+   ===================== */
+body {
+  font-family: var(--font);
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 4rem 1rem;
+}
+
+.page {
+  width: 100%;
+  max-width: 280px;
+}
+
+/* =====================
+   Datepicker wrapper
+   position: relative is the anchor for the absolutely
+   positioned calendar dropdown below.
+   ===================== */
+.datepicker {
+  position: relative;
+  width: 100%;
+}
+
+/* =====================
+   Hidden checkbox — the CSS-only toggle mechanism.
+   Visually hidden but still part of the document so
+   :checked can be read by sibling/descendant selectors.
+   ===================== */
+.cal-toggle {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+
+/* =====================
+   Input field row
+   ===================== */
+.datepicker__field {
+  display: flex;
+  align-items: stretch;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  background-color: var(--white);
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+
+.datepicker__field:focus-within {
+  border-color: var(--primary);
+}
+
+.datepicker__input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 0.55rem 0.875rem;
+  font-family: var(--font);
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  background: transparent;
+  cursor: default;
+  min-width: 0;
+}
+
+.datepicker__input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Icon button — a <label> that clicks the hidden checkbox */
+.datepicker__icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  flex-shrink: 0;
+  border-left: 1.5px solid var(--border);
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.datepicker__icon-btn:hover {
+  background-color: var(--hover-bg);
+  color: var(--text);
+}
+
+/* Icon button active state when calendar is open */
+.cal-toggle:checked ~ .datepicker__field .datepicker__icon-btn {
+  background-color: var(--primary);
+  color: var(--white);
+  border-left-color: var(--primary);
+}
+
+/* =====================
+   Calendar dropdown
+
+   KEY TECHNIQUE: position absolute removes the element from
+   normal document flow. It is positioned relative to the
+   nearest positioned ancestor — .datepicker (position: relative).
+
+   top: calc(100% + 6px) places it 6px below the input row.
+   ===================== */
+.datepicker__calendar {
+  display: none;                   /* hidden by default */
+  position: absolute;              /* out of normal flow */
+  top: calc(100% + 6px);          /* just below the input */
+  left: 0;
+  right: 0;
+  z-index: 100;                    /* float above other content */
+  background-color: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+/* Show the calendar when the checkbox is checked */
+.cal-toggle:checked ~ .datepicker__calendar {
+  display: block;
+}
+
+/* =====================
+   Calendar header
+   ===================== */
+.cal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0.875rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.cal__month-year {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.cal__nav {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  border-radius: 50%;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.cal__nav:hover {
+  background-color: var(--hover-bg);
+  color: var(--text);
+}
+
+/* =====================
+   Date grid — 7-column CSS Grid
+   ===================== */
+.cal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  padding: 0.5rem 0.625rem 0.75rem;
+}
+
+/* Day-name headers (S M T W T F S) */
+.cal__day-name {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  font-size: 0.725rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* Date cells */
+.cal__day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  margin: 0 auto;
+  font-size: 0.8rem;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.12s, color 0.12s;
+  color: var(--text);
+}
+
+/* Empty cells (spacers before day 1) */
+.cal__day:empty {
+  cursor: default;
+  pointer-events: none;
+}
+
+.cal__day:not(:empty):hover {
+  background-color: var(--hover-bg);
+}
+
+/* Today */
+.cal__day--today {
+  background-color: var(--today-bg);
+  color: var(--today-text);
+  font-weight: 600;
+}
+
+.cal__day--today:hover {
+  background-color: var(--today-bg);
+}
+
+/* Selected day */
+.cal__day--selected {
+  background-color: var(--primary);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.cal__day--selected:hover {
+  background-color: var(--primary-dark);
+}
